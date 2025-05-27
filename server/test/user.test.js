@@ -39,5 +39,48 @@ describe('User API', () => {
     expect(res.body.username).toBe('testuser');
   });
 
-  // Add more tests here...
+ it('should get all users', async () => {
+  await request(app)
+    .post('/api/users')
+    .send({
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123'
+    });
+
+  const res = await request(app)
+    .get('/api/users');
+
+  expect(res.statusCode).toBe(200);
+  expect(Array.isArray(res.body)).toBe(true);
+  expect(res.body.length).toBeGreaterThan(0);
 });
+
+it('should delete user', async () => {
+    const res = await request(app)
+      .post('/api/users')
+      .send({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'password123',
+      });
+
+  const userId = res.body._id; // 2. Get the user's _id
+
+  // 3. Send a DELETE request
+  const deleteRes = await request(app)
+    .delete(`/api/users/${userId}`);
+
+  // 4. Check the response
+  expect(deleteRes.statusCode).toBe(200);
+  expect(deleteRes.body).toHaveProperty('message', 'User deleted');
+
+  // 5. Optionally, check that the user is gone
+  const getRes = await request(app)
+    .get(`/api/users/${userId}`);
+  expect(getRes.statusCode).toBe(404);
+});
+
+});
+
+
