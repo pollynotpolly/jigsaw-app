@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const auth = require('../middleware/auth'); 
 
 // create new user 
 router.post('/', async (req, res) => {
@@ -14,7 +15,7 @@ router.post('/', async (req, res) => {
 });
 
 // get all users 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try { 
         const users = await User.find();
         res.json(users);
@@ -24,7 +25,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get a single user by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     try {
       const user = await User.findById(req.params.id);
       if (!user) return res.status(404).json({ error: 'User not found' });
@@ -35,7 +36,7 @@ router.get('/:id', async (req, res) => {
   });
   
   // Update a user
-  router.put('/:id', async (req, res) => {
+  router.put('/:id', auth, async (req, res) => {
     try {
       const user = await User.findByIdAndUpdate(
         req.params.id,
@@ -50,7 +51,7 @@ router.get('/:id', async (req, res) => {
   });
   
   // Delete a user
-  router.delete('/:id', async (req, res) => {
+  router.delete('/:id', auth, async (req, res) => {
     try {
       const user = await User.findByIdAndDelete(req.params.id);
       if (!user) return res.status(404).json({ error: 'User not found' });
